@@ -25,13 +25,14 @@ def get_access_token():
 def get_weather():
     key = os.getenv("WEATHER_KEY")
     city = os.getenv("CITY")
-    
+
     if not key or not city:
         print("❌ 天气配置缺失")
         return None
 
-    # 👇 核心修复：替换为兼容旧域名
-    url = f"https://api.qweather.com/v7/weather/3d?location={city}&key={key}"
+    # ✅ 已经用你专属的 API Host
+    url = f"https://jq4t2cc795.re.qweatherapi.com/v7/weather/3d?location={city}&key={key}"
+    
     try:
         res = requests.get(url, timeout=10).json()
         if res.get("code") != "200":
@@ -96,11 +97,11 @@ def send_message(token, weather, clothes):
     try:
         response = requests.post(url, json=data, timeout=10)
         result = response.json()
-        print("✅ 发送结果：", result)
+        print("✅ 微信返回结果：", result)
         if result.get("errcode") == 0:
             print("🎉 微信消息发送成功！")
         else:
-            print("❌ 微信返回错误：", result)
+            print("❌ 微信发送失败：", result)
     except Exception as e:
         print("❌ 发送请求失败：", e)
 
