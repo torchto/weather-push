@@ -30,7 +30,8 @@ def get_weather():
         print("❌ 天气配置缺失")
         return None
 
-    url = f"https://devapi.qweather.com/v7/weather/3d?location={city}&key={key}"
+    # 👇 核心修复：替换为兼容旧域名
+    url = f"https://api.qweather.com/v7/weather/3d?location={city}&key={key}"
     try:
         res = requests.get(url, timeout=10).json()
         if res.get("code") != "200":
