@@ -30,7 +30,7 @@ def get_weather():
         print("❌ 天气配置缺失")
         return None
 
-    # ✅ 已经用你专属的 API Host
+    # 你的专属和风天气域名
     url = f"https://jq4t2cc795.re.qweatherapi.com/v7/weather/3d?location={city}&key={key}"
     
     try:
@@ -66,22 +66,19 @@ def make_clothes(tempMax, weather):
         s += "，记得带伞"
     return s
 
-def send_message(token, weather, clothes):
-    openid = os.getenv("OPENID")
+# 发送消息函数，支持多用户
+def send_message(token, weather, clothes, touser_openid):
     template_id = os.getenv("TEMPLATE_ID")
     city_name = os.getenv("CITY_NAME")
 
-    if not token:
-        print("❌ 无 token，无法发送")
-        return
-    if not openid or not template_id:
-        print("❌ OPENID 或 TEMPLATE_ID 未配置")
+    if not token or not touser_openid or not template_id:
+        print(f"❌ 参数缺失，用户{touser_openid}无法发送")
         return
 
     url = f"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={token}"
     
     data = {
-        "touser": openid,
+        "touser": touser_openid,
         "template_id": template_id,
         "data": {
             "first": {"value": "🌤️ 明日天气及穿衣建议"},
@@ -97,13 +94,13 @@ def send_message(token, weather, clothes):
     try:
         response = requests.post(url, json=data, timeout=10)
         result = response.json()
-        print("✅ 微信返回结果：", result)
+        print(f"用户 {touser_openid} 推送结果：", result)
         if result.get("errcode") == 0:
-            print("🎉 微信消息发送成功！")
+            print(f"🎉 用户 {touser_openid} 消息发送成功！")
         else:
-            print("❌ 微信发送失败：", result)
+            print(f"❌ 用户 {touser_openid} 发送失败：", result)
     except Exception as e:
-        print("❌ 发送请求失败：", e)
+        print(f"❌ 用户 {touser_openid} 请求异常：", e)
 
 if __name__ == "__main__":
     print("=== 开始运行 ===")
@@ -113,4 +110,14 @@ if __name__ == "__main__":
 
     clothes = make_clothes(weather["tempMax"], weather["weather"])
     token = get_access_token()
-    send_message(token, weather, clothes)
+
+    # ========== 这里配置所有要推送的用户 ==========
+    user_list = [
+        os.getenv("OPENID"),   # 原来的第一个用户
+        os.getenv("OPENID2")   # 你新增的第二个用户
+    ]
+    # ============================================
+
+    # 循环给所有用户推送
+    for openid in user_list:
+        send_message(token, weather, clothes, openid)
