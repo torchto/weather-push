@@ -3,7 +3,8 @@ name: 天气推送
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 22 * * *"
+    # 北京时间 23:00
+    - cron: "0 15 * * *"
 
 jobs:
   run:
@@ -28,6 +29,7 @@ jobs:
           APPID: ${{ secrets.APPID }}
           APPSECRET: ${{ secrets.APPSECRET }}
           OPENID: ${{ secrets.OPENID }}
+          OPENID2: ${{ secrets.OPENID2 }}
           TEMPLATE_ID: ${{ secrets.TEMPLATE_ID }}
           CITY_NAME: ${{ secrets.CITY_NAME }}
           CITY: ${{ secrets.CITY }}
